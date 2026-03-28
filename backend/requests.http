@@ -1,0 +1,24 @@
+### Register User
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Farmer",
+  "email": "john@farm.com",
+  "password": "password123",
+  "location": "Lagos",
+  "farmSize": 50
+}
+
+### Login User
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@farm.com",
+  "password": "password123"
+}
+
+### Get Me (Protected)
+GET http://localhost:5000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg3NDdhOTllLWM3MTUtNDZhOS1hNjYxLTA1NTA4YzlkNjMwYyIsImVtYWlsIjoiam9obkBmYXJtLmNvbSIsImlhdCI6MTc3NDcwMjc5OSwiZXhwIjoxNzc1MzA3NTk5fQ.YMT61tTa4V39vp8oUsV9HZZd5qxkQu6Rh8Pxv0MJxy0
