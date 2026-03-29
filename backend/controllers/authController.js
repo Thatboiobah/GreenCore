@@ -1,43 +1,36 @@
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import { createUser, getUserByEmail } from '../models/User.js'
+import supabase from '../config/db.js'
+import { createUser, getUserById } from '../models/User.js'
 
 // Register
 export const register = async (req, res) => {
   try {
     const { name, email, password, location, farmSize } = req.body
 
-    // Validate
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Missing required fields' })
     }
 
-    // Check if user exists
-    const existingUser = await getUserByEmail(email)
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' })
-    }
+    // Supabase Auth handles password hashing + user creation
+    const { data, error } = await supabase.auth.signUp({ email, password })
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10)
+    if (error) return res.status(400).json({ error: error.message })
 
-    // Create user
+    const userId = data.user.id
+
+    // Save extra fields to your users table
     const user = await createUser({
+      id: userId,
       name,
       email,
-      password: hashedPassword,
       location: location || null,
       farm_size: farmSize || null
     })
 
-    // Generate token
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    )
-
-    res.status(201).json({ message: 'User registered', token, user })
+    res.status(201).json({
+      message: 'User registered',
+      token: data.session?.access_token,
+      user
+    })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
@@ -52,26 +45,21 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: 'Email and password required' })
     }
 
-    // Find user
-    const user = await getUserByEmail(email)
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' })
-    }
+    // Supabase Auth handles password check + token generation
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
 
-    // Check password
-    const isValid = await bcrypt.compare(password, user.password)
-    if (!isValid) {
-      return res.status(401).json({ error: 'Invalid credentials' })
-    }
+    if (error) return res.status(401).json({ error: error.message })
 
-    // Generate token
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    )
+    const user = await getUserById(data.user.id)
 
-    res.json({ message: 'Login successful', token, user })
+    res.json({
+      message: 'Login successful',
+      token: data.session.access_token,
+      user
+    })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
@@ -79,5 +67,10 @@ export const login = async (req, res) => {
 
 // Get current user
 export const getMe = async (req, res) => {
-  res.json({ user: req.user })
+  try {
+    const user = await getUserById(req.user.id)
+    res.json({ user })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
 }

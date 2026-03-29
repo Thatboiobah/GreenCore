@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken'
+import supabase from '../config/db.js'
 
-export const authMiddleware = (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1]
 
   if (!token) {
@@ -8,8 +8,13 @@ export const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = decoded
+    const { data, error } = await supabase.auth.getUser(token)
+
+    if (error || !data.user) {
+      return res.status(401).json({ error: 'Invalid token' })
+    }
+
+    req.user = data.user
     next()
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' })
