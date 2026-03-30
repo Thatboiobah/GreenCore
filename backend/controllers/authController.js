@@ -10,14 +10,12 @@ export const register = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' })
     }
 
-    // Supabase Auth handles password hashing + user creation
     const { data, error } = await supabase.auth.signUp({ email, password })
 
     if (error) return res.status(400).json({ error: error.message })
 
     const userId = data.user.id
 
-    // Save extra fields to your users table
     const user = await createUser({
       id: userId,
       name,
@@ -29,7 +27,13 @@ export const register = async (req, res) => {
     res.status(201).json({
       message: 'User registered',
       token: data.session?.access_token,
-      user
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        location: user.location,
+        farm_size: user.farm_size
+      }
     })
   } catch (error) {
     res.status(500).json({ error: error.message })
@@ -45,7 +49,6 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: 'Email and password required' })
     }
 
-    // Supabase Auth handles password check + token generation
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -53,12 +56,31 @@ export const login = async (req, res) => {
 
     if (error) return res.status(401).json({ error: error.message })
 
-    const user = await getUserById(data.user.id)
+    // Try to get user from database, if fails, create minimal user object
+    let user
+    try {
+      user = await getUserById(data.user.id)
+    } catch (err) {
+      // User exists in auth but not in users table
+      user = {
+        id: data.user.id,
+        name: data.user.email.split('@')[0], // default to email prefix
+        email: data.user.email,
+        location: null,
+        farm_size: null
+      }
+    }
 
     res.json({
       message: 'Login successful',
       token: data.session.access_token,
-      user
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        location: user.location,
+        farm_size: user.farm_size
+      }
     })
   } catch (error) {
     res.status(500).json({ error: error.message })

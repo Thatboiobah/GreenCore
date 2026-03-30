@@ -1,3 +1,20 @@
+/* Import the Inter font first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+/* Standard Tailwind v3 directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Apply global defaults */
+@layer base {
+  html {
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply antialiased bg-[#fafcfa] text-slate-900 dark:bg-[#122017] dark:text-slate-100;
+  }
+}
