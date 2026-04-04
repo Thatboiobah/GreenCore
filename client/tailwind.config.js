@@ -1,16 +1,16 @@
-/** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}", // Make sure this covers all your React files
-  ],
-  darkMode: "class", // Allows you to toggle dark mode if you want
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors:{
+        "primary": "#e4ff00",
+        "primary-dark": "#1a3a2a",
+        "primary-light": "#2d5a3d",
+        "bg-app": "#0f1f18",
+      },
       fontFamily: {
-        // This links the Tailwind font classes to the Google Font we imported
-        sans: ['Inter', 'sans-serif'],
-        display: ['Inter', 'sans-serif'],
+        sans: ["Inter", "sans-serif"],
+        display: ["Inter", "sans-serif"],
       },
     },
   },
