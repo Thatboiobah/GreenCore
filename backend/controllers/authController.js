@@ -12,7 +12,23 @@ export const register = async (req, res) => {
 
     const { data, error } = await supabase.auth.signUp({ email, password })
 
-    if (error) return res.status(400).json({ error: error.message })
+    if (error) {
+      // Check if it's a network/connection error
+      if (error.message?.includes('timeout') || error.message?.includes('ENOTFOUND') || error.message?.includes('connect')) {
+        return res.status(503).json({ 
+          error: 'Unable to reach authentication service. Please check your internet connection and try again.',
+          code: 'SERVICE_UNAVAILABLE'
+        })
+      }
+      // Email already exists
+      if (error.message?.includes('already registered') || error.message?.includes('User already exists')) {
+        return res.status(400).json({ 
+          error: 'An account with this email already exists. Please log in instead.',
+          code: 'EMAIL_EXISTS'
+        })
+      }
+      return res.status(400).json({ error: error.message })
+    }
 
     const userId = data.user.id
 
@@ -36,7 +52,14 @@ export const register = async (req, res) => {
       }
     })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    // Network or internal server errors
+    if (error.message?.includes('timeout') || error.message?.includes('ENOTFOUND') || error.message?.includes('connect')) {
+      return res.status(503).json({ 
+        error: 'Service temporarily unavailable. Please try again later.',
+        code: 'SERVICE_UNAVAILABLE'
+      })
+    }
+    res.status(500).json({ error: 'An unexpected error occurred. Please try again.' })
   }
 }
 
@@ -54,7 +77,23 @@ export const login = async (req, res) => {
       password
     })
 
-    if (error) return res.status(401).json({ error: error.message })
+    if (error) {
+      // Check if it's a network/connection error
+      if (error.message?.includes('timeout') || error.message?.includes('ENOTFOUND') || error.message?.includes('connect')) {
+        return res.status(503).json({ 
+          error: 'Unable to reach authentication service. Please check your internet connection and try again.',
+          code: 'SERVICE_UNAVAILABLE'
+        })
+      }
+      // Invalid credentials
+      if (error.message?.includes('Invalid login credentials')) {
+        return res.status(401).json({ 
+          error: 'Invalid email or password. Please try again.',
+          code: 'INVALID_CREDENTIALS'
+        })
+      }
+      return res.status(401).json({ error: error.message })
+    }
 
     // Try to get user from database, if fails, create minimal user object
     let user

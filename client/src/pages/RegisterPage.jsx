@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import ErrorAlert from '../components/ErrorAlert'
+import SuccessAlert from '../components/SuccessAlert'
 import api from '../services/api'
 
 const CROP_TYPES = [
@@ -13,6 +15,7 @@ const RegisterPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [form, setForm] = useState({
     name: '', email: '', location: '',
     farmSize: '', cropType: '', password: '', confirmPassword: ''
@@ -25,6 +28,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
 
     if (form.password !== form.confirmPassword) {
       return setError('Passwords do not match')
@@ -43,39 +47,36 @@ const RegisterPage = () => {
         farmSize: form.farmSize,
         cropType: form.cropType
       })
+      setSuccess('Registration successful! Redirecting to dashboard...')
       login(res.data.user, res.data.token)
-      navigate('/dashboard')
+      setTimeout(() => navigate('/dashboard'), 1500)
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed')
+      const errorMessage = err.response?.data?.error || 'Registration failed. Please try again.'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center px-4 py-12">
+    <>
+      <ErrorAlert message={error} onClose={() => setError('')} />
+      <SuccessAlert message={success} onClose={() => setSuccess('')} />
+      
+      <div className="min-h-screen bg-[#1a3a2a] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
         {/* Logo */}
-        <div className="flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 bg-[#22c55e] rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">G</span>
-          </div>
-          <span className="text-[#166534] font-semibold text-lg">GreenCore</span>
-          <div className="ml-auto flex gap-3 text-sm text-gray-500">
-            <a href="#" className="hover:text-gray-700">Log In</a>
-            <a href="#" className="hover:text-gray-700">Support</a>
+        <div className="flex items-center gap-2 mb-8 justify-between">
+          <img src="/assets/greencore-logo-full.png" alt="GreenCore" className="h-20 w-auto" />
+          <div className="flex gap-3 text-sm text-gray-300">
+          <a href="#" className="hover:text-gray-200">Log In</a>
+            <a href="#" className="hover:text-gray-200">Support</a>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-1">Create Your Account</h1>
           <p className="text-gray-500 text-sm mb-8">Join our community of smart farmers today.</p>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-6">
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit}>
             {/* Row 1 */}
@@ -197,17 +198,18 @@ const RegisterPage = () => {
             { label: 'Weather Alerts', desc: 'Stay ahead of weather risks' },
             { label: 'Community', desc: 'Connect with farmers' }
           ].map(item => (
-            <div key={item.label} className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-              <div className="w-8 h-8 bg-green-50 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                <div className="w-3 h-3 bg-[#22c55e] rounded-full" />
+            <div key={item.label} className="bg-[#0f1f18] border border-[#e4ff00]/20 rounded-xl p-4 text-center">
+              <div className="w-8 h-8 bg-[#e4ff00]/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                <div className="w-3 h-3 bg-[#e4ff00] rounded-full" />
               </div>
-              <p className="text-xs font-semibold text-gray-700">{item.label}</p>
+              <p className="text-xs font-semibold text-[#e4ff00]">{item.label}</p>
               <p className="text-xs text-gray-400 mt-0.5">{item.desc}</p>
             </div>
           ))}
         </div>
       </div>
     </div>
+    </>
   )
 }
 

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import ErrorAlert from '../components/ErrorAlert'
+import SuccessAlert from '../components/SuccessAlert'
 import api from '../services/api'
 
 const LoginPage = () => {
@@ -8,6 +10,7 @@ const LoginPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [form, setForm] = useState({ email: '', password: '' })
 
   const handleChange = (e) => {
@@ -18,26 +21,30 @@ const LoginPage = () => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setSuccess('')
     try {
       const res = await api.post('/auth/login', form)
+      setSuccess('Login successful! Redirecting...')
       login(res.data.user, res.data.token)
-      navigate('/dashboard')
+      setTimeout(() => navigate('/dashboard'), 1500)
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed')
+      const errorMessage = err.response?.data?.error || 'Login failed. Please try again.'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex">
+    <>
+      <ErrorAlert message={error} onClose={() => setError('')} />
+      <SuccessAlert message={success} onClose={() => setSuccess('')} />
+      
+      <div className="min-h-screen bg-[#f8fafc] flex">
       {/* Left panel */}
       <div className="hidden lg:flex w-1/2 bg-[#166534] flex-col justify-between p-12">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#22c55e] rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">G</span>
-          </div>
-          <span className="text-white font-semibold text-lg">GreenCore</span>
+        <div>
+          <img src="/assets/greencore-logo-full.png" alt="GreenCore" className="h-20 w-auto" />
         </div>
         <div>
           <h2 className="text-white text-4xl font-bold leading-tight mb-4">
@@ -63,21 +70,12 @@ const LoginPage = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
-          <div className="flex items-center gap-2 mb-8 lg:hidden">
-            <div className="w-8 h-8 bg-[#22c55e] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">G</span>
-            </div>
-            <span className="text-[#166534] font-semibold text-lg">GreenCore</span>
+          <div className="mb-8 lg:hidden">
+            <img src="/assets/greencore-logo-full.png" alt="GreenCore" className="h-20 w-auto" />
           </div>
 
           <h1 className="text-3xl font-bold text-gray-800 mb-1">Welcome back</h1>
           <p className="text-gray-500 text-sm mb-8">Sign in to your GreenCore account</p>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-6">
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
@@ -136,6 +134,7 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

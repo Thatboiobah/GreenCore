@@ -229,10 +229,7 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-1 md:col-span-1 pr-8">
               <div className="flex items-center gap-2 mb-6">
-                <svg className="w-6 h-6 text-[#1bc559]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.5 2.5C14.5 2.5 11.5 4.5 9.5 7.5C7.5 4.5 4.5 2.5 1.5 2.5C1.5 8.5 4.5 14.5 9.5 17.5L12 21.5L14.5 17.5C19.5 14.5 22.5 8.5 22.5 2.5C19.5 2.5 17.5 2.5 17.5 2.5ZM12 13.5C10.5 12 9 9.5 9 7.5C9 7.5 10.5 8 12 9.5C13.5 8 15 7.5 15 7.5C15 9.5 13.5 12 12 13.5Z" />
-                </svg>
-                <span className="text-xl font-bold text-slate-900 dark:text-slate-100">GreenCore</span>
+                <img src="/assets/greencore-logo-full.png" alt="GreenCore" className="h-20 w-auto" />
               </div>
               <p className="text-slate-500 text-sm leading-relaxed mb-8">
                 Empowering the global agriculture community with accessible, AI-driven plant pathology solutions.
