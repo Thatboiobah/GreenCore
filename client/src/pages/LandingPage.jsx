@@ -1,18 +1,112 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import TopNav from '../components/TopNav';
+import CardNav from '../components/CardNav';
 import Aurora from '../components/Aurora';
 
 const LandingPage = () => {
-  const { token } = useAuth()
+  const { token, setToken } = useAuth();
+  const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    setToken(null);
+    localStorage.removeItem('token');
+    setShowLogoutConfirm(false);
+    navigate('/');
+  };
+  
+  const navItems = [
+    {
+      label: 'Features',
+      bgColor: 'rgba(15, 31, 24, 0.8)',
+      textColor: '#e4ff00',
+      links: [
+        { label: 'Disease Detection', href: '#features', ariaLabel: 'AI Crop Disease Detection' },
+        { label: 'Farm Insights', href: '#features', ariaLabel: 'AI Farm Insights' },
+        { label: 'Treatments', href: '#features', ariaLabel: 'Treatment & Prevention' }
+      ]
+    },
+    {
+      label: 'Learn',
+      bgColor: 'rgba(15, 31, 24, 0.8)',
+      textColor: '#e4ff00',
+      links: [
+        { label: 'How It Works', href: '#how-it-works', ariaLabel: 'How It Works section' },
+        { label: 'Documentation', href: '#docs', ariaLabel: 'Documentation' },
+        { label: 'Blog', href: '#blog', ariaLabel: 'Blog' }
+      ]
+    },
+    {
+      label: 'Account',
+      bgColor: 'rgba(15, 31, 24, 0.8)',
+      textColor: '#e4ff00',
+      links: [
+        { label: token ? 'Dashboard' : 'Sign In', href: token ? '/dashboard' : '/login', ariaLabel: token ? 'Go to Dashboard' : 'Sign In' },
+        { label: !token ? 'Sign Up' : 'Profile', href: !token ? '/register' : '/profile', ariaLabel: !token ? 'Create Account' : 'Profile' },
+        { label: 'Support', href: '#support', ariaLabel: 'Support' }
+      ]
+    }
+  ];
+
   return (
     <div className="bg-[#0f1f18] text-white">
-      <TopNav />
+      <CardNav 
+        logo="/assets/greencore-logo-full.png"
+        logoAlt="GreenCore"
+        items={navItems}
+        centerLinks={[
+          { label: 'Home', href: '#home' },
+          { label: 'Features', href: '#features' },
+          { label: 'How it works', href: '#how-it-works' }
+        ]}
+        rightLinks={
+          token 
+            ? [
+                { label: 'Profile', href: '/profile' },
+                { label: 'Logout', onClick: handleLogout, isAction: true }
+              ]
+            : [
+                { label: 'Log In', href: '/login' },
+                { label: 'Sign Up', href: '/register' }
+              ]
+        }
+        baseColor="rgba(26, 58, 42, 0.7)"
+        menuColor="rgb(255, 255, 251)"
+        linkColor="#fafaf7"
+      />
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] backdrop-blur-sm">
+          <div className="bg-[#1a3a2a] border border-[#e4ff00]/30 rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-xl font-bold text-white mb-2">Confirm Logout</h3>
+            <p className="text-gray-300 mb-6">Are you sure you want to log out?</p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main>
         {/* Hero Section */}
-        <section className="relative min-h-screen pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden bg-[#1a3a2a]">
+        <section className="relative min-h-screen pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden bg-[#1a3a2a]">
           {/* Aurora Background */}
           <Aurora 
             colorStops={['#1a3a2a', '#e4ff00', '#1a3a2a']}
