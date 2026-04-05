@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes.js'
 import scanRoutes from './routes/scanRoutes.js'
 import insightsRoutes from './routes/insightsRoutes.js'
+import dashboardRoutes from './routes/dashboardRoutes.js'
 
 dotenv.config()
 
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/scans', scanRoutes)
 app.use('/api/insights', insightsRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 
 app.use((err, req, res, next) => {
   console.error(err.message)

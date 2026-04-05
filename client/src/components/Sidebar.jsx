@@ -1,98 +1,151 @@
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { 
+  FiMenu, 
+  FiX, 
+  FiHome, 
+  FiCamera, 
+  FiClock, 
+  FiUser, 
+  FiLogOut 
+} from 'react-icons/fi'
 
 const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-  { path: '/scan', label: 'Scan Crop', icon: 'center_focus_strong' },
-  { path: '/history', label: 'Scan History', icon: 'history' },
-  { path: '/profile', label: 'Profile', icon: 'person' },
+  { path: '/dashboard', label: 'Dashboard', icon: FiHome },
+  { path: '/scan', label: 'Scan Crop', icon: FiCamera },
+  { path: '/history', label: 'Scan History', icon: FiClock },
+  { path: '/profile', label: 'Profile', icon: FiUser },
 ]
 
 const Sidebar = () => {
   const { pathname } = useLocation()
-  const { user, logout } = useAuth()
+  const { user, setToken } = useAuth()
   const navigate = useNavigate()
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
+  // Handle logout: clear token from auth context and localStorage
   const handleLogout = () => {
-    logout()
+    setToken(null)
+    localStorage.removeItem('token')
     navigate('/login')
   }
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 flex-shrink-0 flex-col bg-white border-r border-slate-200 h-screen sticky top-0">
-        {/* Logo */}
-        <div className="p-6 flex items-center gap-3 border-b border-slate-100">
-          <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
-            <span className="material-symbols-outlined text-white text-xl">eco</span>
-          </div>
-          <div>
-            <h1 className="text-base font-bold leading-none text-slate-900">GreenCore</h1>
-            <p className="text-[11px] text-slate-400 mt-0.5">AI Crop Health</p>
-          </div>
+      {/* Desktop & Mobile Sidebar with Toggle */}
+      <aside className={`
+        fixed md:sticky top-0 left-0 h-screen z-40
+        bg-gradient-to-b from-[#1a3a2a] to-[#0f1f18]
+        border-r border-[#e4ff00]/10
+        transition-all duration-300 ease-in-out
+        ${isSidebarOpen ? 'w-64' : 'w-24'}
+        flex flex-col
+      `}>
+        {/* Header with Hamburger Toggle */}
+        <div className="flex items-center justify-between gap-3 border-b border-[#e4ff00]/10 px-4 py-4">
+          {/* Logo and Name - Hidden when sidebar is collapsed */}
+          {isSidebarOpen ? (
+            <Link to="/dashboard" className="flex items-center gap-3 flex-1 hover:opacity-80 transition-opacity">
+              <img 
+                src="/assets/greencore-logo-full.png" 
+                alt="GreenCore" 
+                className="w-8 h-8 object-contain"
+              />
+              <div className="min-w-0">
+                <h1 className="text-sm font-bold text-white truncate">GreenCore</h1>
+                <p className="text-[10px] text-[#e4ff00]/70 truncate">Farm AI</p>
+              </div>
+            </Link>
+          ) : (
+            <div className="w-8 h-8 bg-[#e4ff00]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <img 
+                src="/assets/greencore-logo-full.png" 
+                alt="GreenCore" 
+                className="w-5 h-5 object-contain"
+              />
+            </div>
+          )}
+
+          {/* Hamburger / Close Button */}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="flex-shrink-0 p-1.5 hover:bg-[#e4ff00]/10 rounded-lg transition-colors text-[#e4ff00]"
+            aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          >
+            {isSidebarOpen ? (
+              <FiX size={20} />
+            ) : (
+              <FiMenu size={20} />
+            )}
+          </button>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        {/* Navigation */}
+        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
           {navItems.map(item => {
+            const Icon = item.icon
             const active = pathname === item.path
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  active
-                    ? 'bg-primary text-white shadow-sm shadow-primary/30'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                className={`
+                  flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                  transition-all duration-200
+                  ${active 
+                    ? 'bg-[#e4ff00]/20 text-[#e4ff00] border-l-2 border-[#e4ff00]' 
+                    : 'text-gray-300 hover:bg-[#e4ff00]/10 hover:text-[#e4ff00]'
+                  }
+                `}
+                title={!isSidebarOpen ? item.label : undefined}
               >
-                <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                {item.label}
+                <Icon size={20} className="flex-shrink-0" />
+                {isSidebarOpen && <span>{item.label}</span>}
               </Link>
             )
           })}
         </nav>
 
-        {/* User + Logout */}
-        <div className="p-3 border-t border-slate-100">
-          <div className="flex items-center gap-3 px-3 py-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
-              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+        {/* User Info + Logout */}
+        <div className="p-2 border-t border-[#e4ff00]/10 space-y-2">
+          <div className="flex items-center gap-3 px-3 py-2">
+            {/* Profile Avatar with First Letter */}
+            <div className="w-10 h-10 bg-[#e4ff00] text-[#1a3a2a] rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">
+              {(user?.name || 'F')?.charAt(0).toUpperCase()}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 truncate">{user?.name || 'Farmer'}</p>
-              <p className="text-xs text-slate-400 truncate">{user?.email || ''}</p>
-            </div>
+            
+            {/* User Info - Hidden when collapsed */}
+            {isSidebarOpen && (
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-white truncate">{user?.name || 'Farmer'}</p>
+                <p className="text-[10px] text-gray-400 truncate">{user?.email || 'user@farm.local'}</p>
+              </div>
+            )}
           </div>
+          
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-500 hover:bg-rose-50 transition-all"
+            className={`
+              w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+              text-sm font-medium transition-all duration-200
+              text-red-400 hover:bg-red-500/20 hover:text-red-300
+            `}
+            title={!isSidebarOpen ? 'Logout' : undefined}
           >
-            <span className="material-symbols-outlined text-[20px]">logout</span>
-            Logout
+            <FiLogOut size={20} className="flex-shrink-0" />
+            {isSidebarOpen && <span>Logout</span>}
           </button>
         </div>
       </aside>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex justify-around z-50">
-        {navItems.map(item => {
-          const active = pathname === item.path
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all ${
-                active ? 'text-primary' : 'text-slate-400'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
-              <span className="text-[10px] font-medium">{item.label.split(' ')[0]}</span>
-            </Link>
-          )
-        })}
-      </nav>
+      {/* Mobile Overlay - Click to close sidebar */}
+      {isSidebarOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </>
   )
 }
