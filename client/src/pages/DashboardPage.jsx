@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useApi } from '../hooks/useApi'
 import { useNavigate } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
-import LoadingSpinner from '../components/LoadingSpinner'
 import { 
   FiTrendingUp, 
   FiAlertCircle, 
@@ -83,7 +81,7 @@ const DashboardPage = () => {
   // }
 
   return (
-    <div className="bg-white min-h-screen pl-24 md:pl-64">
+    <div className="bg-white w-full min-h-screen">
       {/* Top Header Section with Title and Action Button */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-6 md:px-8 py-6 md:py-8 border-b border-[#1a3a2a]/5">
         <div>
@@ -100,7 +98,7 @@ const DashboardPage = () => {
         </button>
       </div>
 
-      <div className="px-6 md:px-8 py-6 md:py-8">
+      <div className="px-6 md:px-8 py-6 md:py-8 h-full">
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-800">
