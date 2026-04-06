@@ -5,7 +5,7 @@ import CardNav from '../components/CardNav';
 import Aurora from '../components/Aurora';
 
 const LandingPage = () => {
-  const { token, setToken } = useAuth();
+  const { token, logout } = useAuth();
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -14,8 +14,7 @@ const LandingPage = () => {
   };
 
   const confirmLogout = () => {
-    setToken(null);
-    localStorage.removeItem('token');
+    logout();
     setShowLogoutConfirm(false);
     navigate('/');
   };

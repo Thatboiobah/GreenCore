@@ -20,14 +20,13 @@ const navItems = [
 
 const Sidebar = () => {
   const { pathname } = useLocation()
-  const { user, setToken } = useAuth()
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   // Handle logout: clear token from auth context and localStorage
   const handleLogout = () => {
-    setToken(null)
-    localStorage.removeItem('token')
+    logout()
     navigate('/login')
   }
 
