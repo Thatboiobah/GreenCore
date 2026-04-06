@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import ErrorAlert from '../components/ErrorAlert'
 import SuccessAlert from '../components/SuccessAlert'
 import api from '../services/api'
+import LiquidEther from '../components/LiquidEther'
 
 const CROP_TYPES = [
   'Tomato', 'Maize', 'Rice', 'Cassava', 'Yam',
@@ -63,8 +64,20 @@ const RegisterPage = () => {
       <ErrorAlert message={error} onClose={() => setError('')} />
       <SuccessAlert message={success} onClose={() => setSuccess('')} />
       
-      <div className="min-h-screen bg-[#1a3a2a] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-2xl">
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      <LiquidEther
+        className="opacity-100"
+        resolution={0.45}
+        mouseForce={18}
+        cursorSize={120}
+        autoDemo
+        autoSpeed={0.45}
+        autoIntensity={2.0}
+        backgroundColor="#166534"
+        colors={['#22c55e', '#bbf7d0', '#16a34a']}
+      />
+
+      <div className="w-full max-w-2xl relative z-10">
         {/* Logo */}
         <div className="flex items-center gap-2 mb-8 justify-between">
           <img src="/assets/greencore-logo-full.png" alt="GreenCore" className="h-20 w-auto" />

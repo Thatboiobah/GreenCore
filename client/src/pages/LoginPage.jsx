@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import ErrorAlert from '../components/ErrorAlert'
 import SuccessAlert from '../components/SuccessAlert'
 import api from '../services/api'
+import LiquidEther from '../components/LiquidEther'
 
 const LoginPage = () => {
   const { login } = useAuth()
@@ -42,11 +43,23 @@ const LoginPage = () => {
       
       <div className="min-h-screen bg-[#f8fafc] flex">
       {/* Left panel */}
-      <div className="hidden lg:flex w-1/2 bg-[#166534] flex-col justify-between p-12">
-        <div>
+      <div className="hidden lg:flex w-1/2 min-h-screen flex-col justify-between p-12 relative overflow-hidden">
+        <LiquidEther
+          className="opacity-100"
+          resolution={0.45}
+          mouseForce={18}
+          cursorSize={120}
+          autoDemo
+          autoSpeed={0.45}
+          autoIntensity={2.0}
+          backgroundColor="#166534"
+          colors={['#22c55e', '#bbf7d0', '#16a34a']}
+        />
+
+        <div className="relative z-10">
           <img src="/assets/greencore-logo-full.png" alt="GreenCore" className="h-20 w-auto" />
         </div>
-        <div>
+        <div className="relative z-10">
           <h2 className="text-white text-4xl font-bold leading-tight mb-4">
             Detect crop diseases instantly with AI
           </h2>
@@ -54,14 +67,14 @@ const LoginPage = () => {
             Upload a photo of your crop leaf and get an instant diagnosis with treatment recommendations.
           </p>
         </div>
-        <div className="flex gap-4">
-          <div className="bg-[#14532d] rounded-xl p-4 flex-1">
-            <p className="text-green-400 text-2xl font-bold">10k+</p>
-            <p className="text-green-300 text-sm mt-1">Scans completed</p>
+        <div className="relative z-10 flex gap-4">
+          <div className="bg-[#14532d]/85 backdrop-blur-sm rounded-xl p-4 flex-1">
+            <p className="text-green-200 text-2xl font-bold">10k+</p>
+            <p className="text-green-200/80 text-sm mt-1">Scans completed</p>
           </div>
-          <div className="bg-[#14532d] rounded-xl p-4 flex-1">
-            <p className="text-green-400 text-2xl font-bold">94%</p>
-            <p className="text-green-300 text-sm mt-1">Detection accuracy</p>
+          <div className="bg-[#14532d]/85 backdrop-blur-sm rounded-xl p-4 flex-1">
+            <p className="text-green-200 text-2xl font-bold">94%</p>
+            <p className="text-green-200/80 text-sm mt-1">Detection accuracy</p>
           </div>
         </div>
       </div>
