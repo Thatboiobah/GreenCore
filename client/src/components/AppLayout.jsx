@@ -2,9 +2,9 @@ import Sidebar from './Sidebar'
 
 const AppLayout = ({ children }) => {
   return (
-    <div className="flex h-screen bg-[#f6f8f7] overflow-hidden">
+    <div className="bg-white min-h-screen">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+      <main className="overflow-y-auto">
         {children}
       </main>
     </div>
