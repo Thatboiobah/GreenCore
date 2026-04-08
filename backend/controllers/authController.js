@@ -1,5 +1,5 @@
 import supabase from '../config/db.js'
-import { createUser, getUserById } from '../models/User.js'
+import { createUser, getUserById, updateUser } from '../models/User.js'
 
 // Register
 export const register = async (req, res) => {
@@ -132,6 +132,45 @@ export const getMe = async (req, res) => {
     const user = await getUserById(req.user.id)
     res.json({ user })
   } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+// Update user profile
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, location, farm_size, crop_type } = req.body
+    const userId = req.user.id
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const updates = {}
+    if (name) updates.name = name
+    if (location) updates.location = location
+    if (farm_size) updates.farm_size = farm_size
+    if (crop_type) updates.crop_type = crop_type
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No fields to update' })
+    }
+
+    const user = await updateUser(userId, updates)
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        location: user.location,
+        farm_size: user.farm_size,
+        crop_type: user.crop_type
+      }
+    })
+  } catch (error) {
+    console.error('Profile update error:', error)
     res.status(500).json({ error: error.message })
   }
 }

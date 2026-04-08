@@ -3,7 +3,7 @@ import supabase from '../config/db.js'
 export const getUserById = async (id) => {
   const { data, error } = await supabase
     .from('users')
-    .select('id, name, email, location, farm_size, created_at')
+    .select('id, name, email, location, farm_size, crop_type, created_at')
     .eq('id', id)
     .single()
 
@@ -15,7 +15,7 @@ export const createUser = async (userData) => {
   const { data, error } = await supabase
     .from('users')
     .insert([userData])
-    .select('id, name, email, location, farm_size, created_at')
+    .select('id, name, email, location, farm_size, crop_type, created_at')
 
   if (error) throw error
   return data[0]
@@ -26,7 +26,7 @@ export const updateUser = async (id, updates) => {
     .from('users')
     .update(updates)
     .eq('id', id)
-    .select('id, name, email, location, farm_size, created_at')
+    .select('id, name, email, location, farm_size, crop_type, created_at')
 
   if (error) throw error
   return data[0]
