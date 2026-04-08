@@ -1,38 +1,57 @@
-# 🌱 GreenCore: AI-Powered Agricultural Assistant
+# GreenCore: AI-Powered Agricultural Assistant
 
-GreenCore is a full-stack, AI-powered agricultural assistant designed to help farmers detect crop diseases, receive intelligent recommendations, and make data-driven decisions using real-time environmental insights.
+GreenCore is a full-stack agricultural assistant designed to help farmers scan crops for disease, track scan history, and surface actionable insights through a dashboard.
 
-## 🚀 Overview
+## Overview
 
-GreenCore integrates computer vision, real-time APIs, and intelligent analytics into a single platform that empowers farmers—especially those with limited resources—to manage crop health effectively.
+GreenCore combines a React (Vite) frontend with a Node/Express API backed by Supabase (Auth + Postgres).
 
 The system combines:
-- ✅ AI-powered image analysis
-- ✅ Weather and environmental data
-- ✅ Farm activity tracking
-- ✅ Intelligent insights and recommendations
-- ✅ Comprehensive farmer dashboard
+- ✅ Scan history + dashboard metrics
+- ✅ Authenticated API with Supabase
+- ✅ AI-ready pipeline (model integration planned)
+- ⏳ Optional weather/location enrichment (planned)
 
-**Our goal:** Reduce crop loss, improve yield, and make precision farming accessible through simple, intuitive interfaces.
+**Goal:** Reduce crop loss, improve yield, and make precision farming accessible through simple, intuitive interfaces.
 
 ---
 
-## 🧠 Core Capabilities
+## Project Status
 
-### 1. AI Crop Disease Detection
-GreenCore uses a trained machine learning model to analyze crop images and detect diseases.
+**Implemented (MVP):**
+- Supabase Auth (register/login/me)
+- Dashboard metrics + recent scans
+- Scan CRUD at `/api/scans` (scan creation currently runs a mock analyzer based on `cropType`)
 
-**Process:**
-- User uploads or captures a crop image
-- Image is sent to backend for processing
-- AI model analyzes the image
-- Prediction returned with confidence score
+**Planned:**
+- Real image upload + ML inference
+- Enriched recommendations (solution + prevention) from a curated knowledge base
+- Optional weather/location-based risk scoring
 
-**Output:**
+---
+
+## Core Capabilities
+
+### 1. Crop Disease Scanning (Current: mock inference)
+GreenCore supports creating a “scan” record via the backend. Today, the backend returns a deterministic mock result based on `cropType`.
+
+**Current process:**
+- User triggers a scan (frontend)
+- Backend endpoint `POST /api/scans` receives `{ cropType }`
+- Backend stores the scan in Supabase and returns the result
+
+**Planned process:**
+- User uploads/captures an image
+- Backend stores the image (e.g., Supabase Storage)
+- ML service runs inference and returns prediction + confidence
+- Backend enriches with solution/prevention + insights
+
+**Output (current fields):**
 - Crop type
 - Disease name
-- Confidence level (0-100%)
-- Severity assessment
+- Confidence level (0–100%)
+- Optional severity
+- Optional solution
 
 ### 2. AI-Powered Recommendations
 Based on detected diseases, GreenCore generates:
@@ -42,19 +61,11 @@ Based on detected diseases, GreenCore generates:
 
 This ensures farmers not only identify problems but solve them effectively.
 
-### 3. Weather Integration 🌦
-Real-time environmental insights via weather API:
-- Current weather conditions
-- Temperature & humidity tracking
-- Rainfall predictions
-- Disease risk prediction (e.g., fungal diseases in high humidity)
-- Irrigation strategy recommendations
+### 3. Weather Integration (Planned)
+Weather integration is a planned enhancement and is not wired in via backend endpoints in this repo yet.
 
-### 4. Location-Based Services 📍
-Using geolocation capabilities:
-- Detect farmer's location
-- Provide localized weather data
-- Enable regional disease tracking
+### 4. Location-Based Services (Planned)
+Location-based enrichment is planned (frontend geolocation + optional backend storage/analytics).
 
 ### 5. Farmer Dashboard
 A centralized interface displaying:
