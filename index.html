@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Green core Scan — Plant Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080e08;
+      --surface:   #0d160d;
+      --panel:     #111a11;
+      --border:    #1e2e1e;
+      --green-dim: #2a4a2a;
+      --green:     #4ade80;
+      --green-glow:#4ade8055;
+      --amber:     #fbbf24;
+      --red:       #f87171;
+      --text:      #e8f0e8;
+      --muted:     #6b8a6b;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: .35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -180px; left: -180px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #4ade8018 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .blob-br {
+      position: fixed;
+      bottom: -200px; right: -200px;
+      width: 550px; height: 550px;
+      background: radial-gradient(circle, #4ade8011 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 36px 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown .6s ease both;
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--green);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px var(--green-glow);
+    }
+
+    .logo-text { font-family: 'Playfair Display', serif; font-size: 1.3rem; letter-spacing: .02em; }
+    .logo-text span { color: var(--green); }
+
+    .badge {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem; font-weight: 500;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* ── Main ── */
+    main {
+      padding: 48px 0;
+      display: flex; flex-direction: column; gap: 32px;
+      animation: fadeUp .7s .15s ease both;
+    }
+
+    .headline { text-align: center; }
+
+    .headline h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700; line-height: 1.15; letter-spacing: -.01em;
+    }
+
+    .headline h1 em { font-style: italic; color: var(--green); }
+
+    .headline p {
+      margin-top: 12px;
+      color: var(--muted); font-size: .95rem; line-height: 1.6;
+      max-width: 480px; margin-inline: auto;
+    }
+
+    /* ── Upload Card ── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .upload-zone {
+      position: relative;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      cursor: pointer;
+      transition: background .25s;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover { background: #4ade800a; }
+
+    #file-input {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+
+    .upload-preview {
+      width: 100%; max-width: 320px;
+      border-radius: 12px; object-fit: cover; max-height: 240px;
+      display: none;
+      box-shadow: 0 8px 32px #0006;
+    }
+
+    .upload-icon {
+      width: 64px; height: 64px;
+      border: 2px dashed var(--green-dim);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: var(--green);
+      transition: border-color .25s, box-shadow .25s;
+    }
+
+    .upload-zone:hover .upload-icon {
+      border-color: var(--green);
+      box-shadow: 0 0 20px var(--green-glow);
+    }
+
+    .upload-label { font-size: .95rem; color: var(--muted); text-align: center; }
+    .upload-label strong { color: var(--green); font-weight: 500; }
+
+    .file-name {
+      font-family: 'DM Mono', monospace;
+      font-size: .75rem; color: var(--green); display: none;
+    }
+
+    .card-divider { height: 1px; background: var(--border); }
+
+    .card-footer {
+      padding: 20px 32px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+
+    .meta { font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted); line-height: 1.6; }
+
+    .btn-analyze {
+      position: relative;
+      background: var(--green); color: #080e08;
+      border: none; padding: 12px 28px; border-radius: 12px;
+      font-family: 'Outfit', sans-serif; font-weight: 500; font-size: .95rem;
+      cursor: pointer; letter-spacing: .02em;
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+      white-space: nowrap;
+    }
+
+    .btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 6px 24px var(--green-glow); }
+    .btn-analyze:active { transform: translateY(0); }
+
+    .btn-analyze.loading { opacity: .7; pointer-events: none; }
+    .btn-analyze.loading::after {
+      content: '';
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 14px; height: 14px;
+      border: 2px solid transparent;
+      border-top-color: #080e08;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    /* Scan bar */
+    .scanning-bar {
+      display: none; position: absolute; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      animation: scan 1.4s ease-in-out infinite;
+      top: 0;
+    }
+
+    .card.scanning .scanning-bar { display: block; }
+    .card.scanning .upload-zone  { pointer-events: none; }
+
+    /* ── Results ── */
+    .results-section {
+      display: flex; flex-direction: column; gap: 36px;
+      animation: fadeUp .5s ease both;
+    }
+
+    /* Section header with line */
+    .section-head {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .section-head h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .section-head .line {
+      flex: 1; height: 1px; background: var(--border);
+    }
+
+    .section-head .pill-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Tags */
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: .63rem; letter-spacing: .1em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px; font-weight: 500;
+    }
+
+    .tag.healthy  { background: #4ade8022; color: var(--green); border: 1px solid #4ade8044; }
+    .tag.disease  { background: #f8717122; color: var(--red);   border: 1px solid #f8717144; }
+    .tag.warn     { background: #fbbf2422; color: var(--amber); border: 1px solid #fbbf2444; }
+    .tag.info     { background: #60a5fa22; color: #60a5fa;      border: 1px solid #60a5fa44; }
+
+    .remaining-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--muted);
+    }
+
+    .remaining-pill::before {
+      content: ''; width: 6px; height: 6px;
+      border-radius: 50%; background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    /* Results grid */
+    .results-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+
+    .result-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+      display: flex; flex-direction: column; gap: 7px;
+      transition: border-color .2s;
+    }
+
+    .result-card:hover { border-color: var(--green-dim); }
+    .result-card.full { grid-column: 1 / -1; }
+
+    /* Card color variants */
+    .card-healthy  { border-color: #4ade8044 !important; background: #4ade8009 !important; }
+    .card-disease  { border-color: #f8717133 !important; background: #f8717109 !important; }
+    .card-warn     { border-color: #fbbf2433 !important; background: #fbbf2409 !important; }
+    .card-cure     { border-color: #f8717122 !important; }
+    .card-prevent  { border-color: #4ade8022 !important; }
+
+    .rc-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .63rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .rc-label.green  { color: var(--green); }
+    .rc-label.red    { color: var(--red); }
+    .rc-label.amber  { color: var(--amber); }
+
+    .rc-value {
+      font-size: 1.05rem; font-weight: 500;
+      color: var(--text); line-height: 1.4;
+    }
+
+    .rc-value.green   { color: var(--green); }
+    .rc-value.amber   { color: var(--amber); }
+    .rc-value.red     { color: var(--red); }
+    .rc-value.muted   { color: #a8c4a8; font-size: .9rem; }
+    .rc-value.prose   { font-size: .88rem; font-weight: 300; line-height: 1.7; color: #a8c4a8; }
+    .rc-value.italic  { font-style: italic; }
+    .rc-value.big     { font-size: 1.3rem; font-family: 'Playfair Display', serif; font-style: italic; }
+
+    /* Confidence bar */
+    .conf-bar {
+      height: 4px; background: var(--border);
+      border-radius: 4px; margin-top: 6px; overflow: hidden;
+    }
+
+    .conf-fill {
+      height: 100%; border-radius: 4px; background: var(--green);
+      transition: width 1s ease;
+    }
+
+    .conf-fill.low { background: var(--amber); }
+
+    /* Disease status row */
+    .status-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .status-row .score {
+      font-family: 'DM Mono', monospace;
+      font-size: .7rem; color: var(--muted);
+    }
+
+    /* Alert */
+    .alert {
+      background: #f8717112; border: 1px solid #f8717133;
+      border-radius: 14px; padding: 18px 22px;
+      display: flex; align-items: center; gap: 14px;
+      font-size: .9rem; color: var(--red);
+      animation: fadeUp .4s ease both;
+    }
+
+    .alert-icon { font-size: 1.3rem; flex-shrink: 0; }
+
+    /* Footer */
+    footer {
+      padding: 20px 0 32px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: 'DM Mono', monospace;
+      font-size: .68rem; color: var(--muted); letter-spacing: .06em;
+      animation: fadeUp .8s .3s ease both;
+    }
+
+    /* Responsive */
+    @media (max-width: 560px) {
+      .results-grid  { grid-template-columns: 1fr; }
+      .card-footer   { flex-direction: column; align-items: stretch; }
+      .btn-analyze   { text-align: center; }
+      .section-head  { flex-wrap: wrap; }
+    }
+
+    /* Keyframes */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+    @keyframes scan {
+      0%   { top: 0;    opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .3; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob-br"></div>
+
+<div class="wrapper">
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🌿</div>
+      <div class="logo-text">green<span>core</span></div>
+    </div>
+    <div class="badge">AI · Plant Intelligence</div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main>
+
+    <div class="headline">
+      <h1>Identify any plant<br><em>in seconds.</em></h1>
+      <p>Upload a photo of any plant and our AI will identify the species and detect diseases — instantly.</p>
+    </div>
+
+    <!-- Upload Form -->
+    <form action="/analyze" method="POST" enctype="multipart/form-data" id="upload-form">
+      <div class="card" id="upload-card">
+        <div class="scanning-bar"></div>
+
+        <div class="upload-zone" id="drop-zone">
+          <input type="file" name="image" id="file-input" accept=".jpg,.jpeg,.png,.webp" required/>
+          <img class="upload-preview" id="preview-img" alt="Preview"/>
+          <div class="upload-icon" id="upload-icon">🍃</div>
+          <div class="upload-label">
+            <strong>Click to upload</strong> or drag & drop<br/>
+            JPG, PNG, WEBP — max 5 MB
+          </div>
+          <div class="file-name" id="file-name"></div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-footer">
+          <div class="meta">
+            PlantNet + Hugging Face AI<br/>
+            Species ID · Disease Detection
+          </div>
+          <button type="submit" class="btn-analyze" id="analyze-btn">
+            Analyze Plant →
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Error -->
+    {% if error %}
+    <div class="alert">
+      <div class="alert-icon">⚠️</div>
+      <div>{{ error }}</div>
+    </div>
+    {% endif %}
+
+    <!-- ══════════════════════════════
+         RESULTS
+    ══════════════════════════════ -->
+    {% if result %}
+    <div class="results-section">
+
+      <!-- ── 1. Plant Identification ── -->
+      <div>
+        <div class="section-head">
+          <h2>Plant Identification</h2>
+          <div class="line"></div>
+          <div class="pill-row">
+            {% if result.low_confidence %}
+              <span class="tag warn">Low Confidence</span>
+            {% else %}
+              <span class="tag info">Identified</span>
+            {% endif %}
+            {% if result.remaining_requests is defined %}
+              <div class="remaining-pill">{{ result.remaining_requests }} left today</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="results-grid">
+
+          <div class="result-card full">
+            <div class="rc-label">Best Match</div>
+            <div class="rc-value green big">{{ result.best_match }}</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-label">Scientific Name</div>
+            <div class="rc-value italic muted">{{ result.scientific_name }}</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-label">Plant Family</div>
+            <div class="rc-value">{{ result.family }}</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-label">Genus</div>
+            <div class="rc-value italic">{{ result.genus }}</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-label">Identification Confidence</div>
+            <div class="rc-value {% if result.low_confidence %}amber{% else %}green{% endif %}">
+              {{ result.confidence }}
+            </div>
+            <div class="conf-bar">
+              <div class="conf-fill {% if result.low_confidence %}low{% endif %}"
+                   style="width:{ result.confidence }"></div>
+            </div>
+          </div>
+
+          <div class="result-card full">
+            <div class="rc-label">Common Names</div>
+            <div class="rc-value muted">{{ result.common_names | join(', ') }}</div>
+          </div>
+
+          {% if result.low_confidence %}
+          <div class="result-card full card-warn">
+            <div class="rc-label amber">⚠ Note</div>
+            <div class="rc-value prose" style="color:var(--amber);">
+              Confidence is below 50%. Try a clearer, well-lit photo showing the leaf, flower, or fruit more prominently.
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- ── 2. Disease Detection ── -->
+      {% if result.disease %}
+      <div>
+        <div class="section-head">
+          <h2>Disease Detection</h2>
+          <div class="line"></div>
+          <div class="pill-row">
+            {% if result.disease.error %}
+              <span class="tag warn">Unavailable</span>
+            {% elif result.disease.is_healthy %}
+              <span class="tag healthy">Healthy ✓</span>
+            {% else %}
+              <span class="tag disease">Disease Found</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="results-grid">
+
+          {% if result.disease.error %}
+          <!-- ── Error ── -->
+          <div class="result-card full card-warn">
+            <div class="rc-label amber">⚠ Detection Unavailable</div>
+            <div class="rc-value prose" style="color:var(--amber);">{{ result.disease.error }}</div>
+          </div>
+
+          {% elif result.disease.is_healthy %}
+          <!-- ── Healthy ── -->
+          <div class="result-card full card-healthy">
+            <div class="rc-label green">✅ Health Status</div>
+            <div class="status-row">
+              <div class="rc-value green" style="font-size:1.1rem;">{{ result.disease.label }}</div>
+              <span class="tag healthy">{{ result.disease.confidence }} confidence</span>
+            </div>
+            <div class="rc-value prose" style="margin-top:4px;">{{ result.disease.description }}</div>
+          </div>
+
+          <div class="result-card full card-prevent">
+            <div class="rc-label green">🛡 Preventive Care</div>
+            <div class="rc-value prose">{{ result.disease.prevention }}</div>
+          </div>
+
+          {% else %}
+          <!-- ── Disease detected ── -->
+          <div class="result-card full card-disease">
+            <div class="rc-label red">🦠 Condition Identified</div>
+            <div class="status-row">
+              <div class="rc-value red" style="font-size:1.15rem; font-weight:600;">{{ result.disease.label }}</div>
+              <span class="tag disease">{{ result.disease.confidence }} confidence</span>
+            </div>
+          </div>
+
+          <div class="result-card full">
+            <div class="rc-label">About this Condition</div>
+            <div class="rc-value prose">{{ result.disease.description }}</div>
+          </div>
+
+          <div class="result-card card-cure">
+            <div class="rc-label red">💊 Recommended Cure</div>
+            <div class="rc-value prose">{{ result.disease.cure }}</div>
+          </div>
+
+          <div class="result-card card-prevent">
+            <div class="rc-label green">🛡 Prevention</div>
+            <div class="rc-value prose">{{ result.disease.prevention }}</div>
+          </div>
+
+          {% endif %}
+
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    {% endif %}
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <span>FloraScan © 2026</span>
+    <span>Plant Intelligence System · v2.1</span>
+  </footer>
+
+</div>
+
+<script>
+  const input    = document.getElementById('file-input');
+  const preview  = document.getElementById('preview-img');
+  const icon     = document.getElementById('upload-icon');
+  const fileName = document.getElementById('file-name');
+  const dropZone = document.getElementById('drop-zone');
+  const form     = document.getElementById('upload-form');
+  const btn      = document.getElementById('analyze-btn');
+  const card     = document.getElementById('upload-card');
+
+  function showPreview(file) {
+    if (!file) return;
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+    icon.style.display = 'none';
+    fileName.textContent = file.name;
+    fileName.style.display = 'block';
+  }
+
+  input.addEventListener('change', () => { if (input.files[0]) showPreview(input.files[0]); });
+
+  dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      showPreview(file);
+    }
+  });
+
+  form.addEventListener('submit', () => {
+    btn.textContent = 'Analyzing…';
+    btn.classList.add('loading');
+    card.classList.add('scanning');
+  });
+</script>
+
+</body>
+</html>
