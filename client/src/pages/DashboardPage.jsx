@@ -189,45 +189,52 @@ const DashboardPage = () => {
                 <div className="overflow-x-auto -mx-6 -mb-6">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-[#1a3a2a]/10 bg-[#1a3a2a]/3">
+                      <tr className="border-b border-[#1a3a2a]/10 bg-[#1a3a2a]/[0.03]">
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Crop</th>
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Diagnosis</th>
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Date</th>
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Confidence</th>
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Action</th>
-                      <button
-                        onClick={handleNewScan}
-                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1a3a2a] bg-[#e4ff00] rounded-lg shadow-sm hover:shadow-md hover:brightness-105 transition-all"
-                      >
-                        <FiPlus className="mr-1.5" />
-                        New Scan
-                      </button>
-                      <button
-                        onClick={() => navigate('/profile')}
-                        className="inline-flex items-center justify-center w-9 h-9 mr-1 md:mr-3 rounded-lg bg-[#e4ff00] text-[#1a3a2a] shadow-md hover:shadow-lg transition-all"
-                        aria-label="Open profile"
-                      >
-                        <span className="text-sm font-semibold">
-                          {userInitial}
-                        </span>
-                      </button>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recentScans.map((scan) => (
+                        <tr
+                          key={scan.id || scan.scan_id}
+                          className="border-b border-[#1a3a2a]/5 last:border-0 hover:bg-[#1a3a2a]/[0.02] transition-colors"
+                        >
+                          <td className="py-4 px-6 text-gray-800 font-medium">
+                            {scan.crop_type || 'Unknown crop'}
                           </td>
                           <td className="py-4 px-6">
-                            <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${scan.disease_detected ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                            <span
+                              className={`text-xs font-bold px-3 py-1.5 rounded-full ${
+                                scan.disease_detected
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-green-100 text-green-700'
+                              }`}
+                            >
                               {scan.disease_name || 'Healthy'}
                             </span>
                           </td>
                           <td className="py-4 px-6 text-gray-600 text-sm">
-                            {new Date(scan.scan_date).toLocaleDateString()}
+                            {scan.scan_date
+                              ? new Date(scan.scan_date).toLocaleDateString()
+                              : '--'}
                           </td>
                           <td className="py-4 px-6">
                             <span className="text-[#e4ff00] font-bold text-sm">
-                              {scan.confidence_score}%
+                              {typeof scan.confidence_score === 'number'
+                                ? `${scan.confidence_score}%`
+                                : '--'}
                             </span>
                           </td>
                           <td className="py-4 px-6">
-                            <button className="text-gray-400 hover:text-[#1a3a2a] transition-colors text-xl">
-                              ⋯
+                            <button
+                              onClick={() => navigate(`/scan-result/${scan.id || scan.scan_id}`)}
+                              className="text-xs font-semibold text-[#1a3a2a] border border-[#1a3a2a]/30 rounded-full px-3 py-1 hover:bg-[#1a3a2a] hover:text-white transition-colors"
+                            >
+                              View
                             </button>
                           </td>
                         </tr>
