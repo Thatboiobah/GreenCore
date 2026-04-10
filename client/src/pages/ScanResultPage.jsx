@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { FiArrowLeft } from 'react-icons/fi'
 import { useApi } from '../hooks/useApi'
 import { useAuth } from '../hooks/useAuth'
@@ -10,11 +10,22 @@ const ScanResultPage = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
 
+  const location = useLocation()
+  const stateScan = location.state?.scan
+
   const [scan, setScan] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    // If scan data was passed via navigation state (AI flow), use it directly
+    if (stateScan) {
+      setScan(stateScan)
+      setLoading(false)
+      setError(null)
+      return
+    }
+
     const fetchScan = async () => {
       try {
         setLoading(true)
@@ -31,12 +42,17 @@ const ScanResultPage = () => {
 
     if (scanId) {
       fetchScan()
+    } else {
+      setLoading(false)
     }
-  }, [api, scanId])
+  }, [api, scanId, stateScan])
 
   const cropType = scan?.crop_type || 'Crop'
   const disease = scan?.disease || 'Healthy Plant'
-  const confidence = scan?.confidence
+  const confidence =
+    typeof scan?.confidence === 'number'
+      ? `${scan.confidence}% Match`
+      : scan?.confidence_label || '—'
   const severity = scan?.severity || 'Unknown'
 
   return (
@@ -108,7 +124,7 @@ const ScanResultPage = () => {
           </div>
           <div className="bg-white border border-[#1a3a2a]/8 rounded-xl p-4 shadow-sm">
             <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide mb-1">AI Confidence</p>
-            <p className="text-sm font-bold text-emerald-600 mb-1">{confidence ? `${confidence}% Match` : '—'}</p>
+            <p className="text-sm font-bold text-emerald-600 mb-1">{confidence}</p>
             <p className="text-xs text-gray-500">Higher values indicate stronger model confidence.</p>
           </div>
         </div>
