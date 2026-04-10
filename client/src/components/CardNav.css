@@ -178,6 +178,60 @@
   opacity: 0.9;
 }
 
+/* Right-side auth buttons */
+.nav-right-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition: all 0.2s ease;
+}
+
+.nav-right-btn-primary {
+  background-color: #e4ff00;
+  color: #0f1f18;
+  box-shadow: 0 8px 20px rgba(228, 255, 0, 0.3);
+}
+
+.nav-right-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(228, 255, 0, 0.4);
+}
+
+.nav-right-btn-outline {
+  background-color: transparent;
+  color: #e4ff00;
+  border-color: #e4ff00;
+}
+
+.nav-right-btn-outline:hover {
+  background-color: rgba(228, 255, 0, 0.08);
+}
+
+.nav-right-btn-neutral {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.nav-right-btn-neutral:hover {
+  background-color: #4b5563;
+}
+
+.nav-right-btn-danger {
+  background-color: #ef4444;
+  color: #f9fafb;
+}
+
+.nav-right-btn-danger:hover {
+  background-color: #dc2626;
+}
+
 @media (max-width: 768px) {
   .nav-center {
     display: none;

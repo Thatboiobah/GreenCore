@@ -133,6 +133,31 @@ const CardNav = ({
     if (el) cardsRef.current[i] = el;
   };
 
+  const getRightLinkClass = (link) => {
+    // Style auth links as buttons similar to provided designs
+    if (link.isAction || link.label === 'Logout') {
+      // Solid red logout button
+      return 'nav-right-link nav-right-btn nav-right-btn-danger';
+    }
+
+    if (link.label === 'Log In' || link.label === 'Login') {
+      // Solid yellow login button
+      return 'nav-right-link nav-right-btn nav-right-btn-primary';
+    }
+
+    if (link.label === 'Sign Up' || link.label === 'Sign up' || link.label === 'Create Account') {
+      // Yellow outline sign-up button
+      return 'nav-right-link nav-right-btn nav-right-btn-outline';
+    }
+
+    if (link.label === 'Profile') {
+      // Neutral/clear profile button
+      return 'nav-right-link nav-right-btn nav-right-btn-neutral';
+    }
+
+    return 'nav-right-link';
+  };
+
   return (
     <div className={`card-nav-container ${className}`}>
       <nav ref={navRef} className={`card-nav ${isExpanded ? 'open' : ''}`} style={{ backgroundColor: baseColor }}>
@@ -169,27 +194,33 @@ const CardNav = ({
           </div>
 
           <div className="nav-right">
-            {rightLinks?.map((link, idx) => 
-              link.onClick ? (
+            {rightLinks?.map((link, idx) => {
+              const className = getRightLinkClass(link);
+              const isButtonVariant = className.includes('nav-right-btn');
+              const style = isButtonVariant
+                ? undefined
+                : { color: link.isAction ? '#ef4444' : linkColor };
+
+              return link.onClick ? (
                 <button
                   key={`${link.label}-${idx}`}
                   onClick={link.onClick}
-                  className={`nav-right-link ${link.isAction ? 'nav-action' : ''}`}
-                  style={{ color: link.isAction ? '#ef4444' : linkColor }}
+                  className={className}
+                  style={style}
                 >
                   {link.label}
                 </button>
               ) : (
-                <a 
+                <a
                   key={`${link.label}-${idx}`}
-                  href={link.href} 
-                  className="nav-right-link"
-                  style={{ color: linkColor }}
+                  href={link.href}
+                  className={className}
+                  style={style}
                 >
                   {link.label}
                 </a>
-              )
-            )}
+              );
+            })}
           </div>
         </div>
 

@@ -12,7 +12,7 @@ import {
 
 const DashboardPage = () => {
   // Authentication and data fetching hooks
-  const { token } = useAuth()
+  const { token, user } = useAuth()
   const api = useApi()
   const navigate = useNavigate()
   
@@ -92,10 +92,25 @@ const DashboardPage = () => {
             Here's what's happening on your farm today.
           </p>
         </div>
-        <button onClick={() => navigate('/scan')} className="bg-[#e4ff00] text-[#1a3a2a] px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-[#d4ef00] transition-colors whitespace-nowrap flex items-center gap-2 justify-center md:justify-start">
-          <FiCamera size={18} />
-          + New Scan
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/scan')}
+            className="bg-[#e4ff00] text-[#1a3a2a] px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-[#d4ef00] transition-colors whitespace-nowrap flex items-center gap-2 justify-center md:justify-start"
+          >
+            <FiCamera size={18} />
+            + New Scan
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-[#e4ff00] text-[#1a3a2a] border border-[#1a3a2a]/40 shadow-sm hover:brightness-105 transition-colors"
+            aria-label="Open profile"
+          >
+            <span className="text-sm font-bold">
+              {(user?.name || user?.email || 'F')?.charAt(0).toUpperCase()}
+            </span>
+          </button>
+        </div>
       </div>
 
       <div className="px-6 md:px-8 py-6 md:py-8 h-full">
@@ -180,22 +195,22 @@ const DashboardPage = () => {
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Date</th>
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Confidence</th>
                         <th className="text-left py-3 px-6 text-gray-700 font-semibold text-xs uppercase tracking-wide">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentScans.map((scan, idx) => (
-                        <tr key={idx} className="border-b border-[#1a3a2a]/5 hover:bg-[#1a3a2a]/3 transition-colors">
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              {scan.crop_image && (
-                                <img 
-                                  src={scan.crop_image} 
-                                  alt={scan.crop_type}
-                                  className="w-10 h-10 rounded-lg object-cover"
-                                />
-                              )}
-                              <span className="text-[#1a3a2a] font-semibold text-sm">{scan.crop_type}</span>
-                            </div>
+                      <button
+                        onClick={handleNewScan}
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1a3a2a] bg-[#e4ff00] rounded-lg shadow-sm hover:shadow-md hover:brightness-105 transition-all"
+                      >
+                        <FiPlus className="mr-1.5" />
+                        New Scan
+                      </button>
+                      <button
+                        onClick={() => navigate('/profile')}
+                        className="inline-flex items-center justify-center w-9 h-9 mr-1 md:mr-3 rounded-lg bg-[#e4ff00] text-[#1a3a2a] shadow-md hover:shadow-lg transition-all"
+                        aria-label="Open profile"
+                      >
+                        <span className="text-sm font-semibold">
+                          {userInitial}
+                        </span>
+                      </button>
                           </td>
                           <td className="py-4 px-6">
                             <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${scan.disease_detected ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>

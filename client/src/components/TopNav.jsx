@@ -26,22 +26,35 @@ const TopNav = () => {
           <div className="flex items-center gap-3">
             {token ? (
               <>
-                <Link to="/dashboard" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">
-                  Dashboard
+                {/* Profile (clear/neutral button) */}
+                <Link
+                  to="/profile"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-slate-700 hover:bg-slate-800 transition-colors"
+                >
+                  Profile
                 </Link>
+                {/* Logout (solid red button) */}
                 <button
                   onClick={handleLogout}
-                  className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition-colors"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">
+                {/* Login (solid yellow button) */}
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-primary-dark bg-primary shadow-sm hover:bg-[#f3ff4d] transition-colors"
+                >
                   Login
                 </Link>
-                <Link to="/register" className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#16a34a] transition-colors">
+                {/* Sign up (outline yellow button) */}
+                <Link
+                  to="/register"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold border border-primary text-primary-dark hover:bg-primary/10 transition-colors"
+                >
                   Sign up
                 </Link>
               </>
